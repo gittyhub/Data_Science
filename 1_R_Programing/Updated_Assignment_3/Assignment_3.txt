@@ -1,0 +1,142 @@
+#---Week 4 Programming Assignment
+#Q1 Ploting data which they provided
+outcome <- read.csv("outcome-of-care-measures.csv", colClasses = "character")
+outcome[, 11] <- as.numeric(outcome[, 11])
+hist(outcome[, 11]) 
+
+#Q2 Finding the best hospital in the stat
+library(data.table)
+setwd("/home/hman/2_R_Programming/Week4")
+
+best <- function(state,outcome){
+  filez <- read.csv("outcome-of-care-measures.csv", colClasses="character")
+  SelectedState <- filez[filez$State == state,] #extract all rows where column state equals state
+  
+  SelectedState[,11] <- as.numeric(SelectedState[,11])
+  SelectedState[,17] <- as.numeric(SelectedState[,17])
+  SelectedState[,23] <- as.numeric(SelectedState[,23])
+  NumOutcome <- c("heart attack", "heart failure","pneumoni")
+  if(!state %in% filez$State){
+    stop("invalid state")}
+  else if(!outcome %in% NumOutcome){
+    stop("invalid outcome")}
+  else{
+    if(outcome=="heart attack"){
+      outPass = 11}
+    else if (outcome == "heart failure"){
+      outPass = 17}
+    else{
+      outPass = 23} 
+  }
+
+  fdf <- SelectedState[,c(2,outPass)]
+  min <- min(fdf[,2],na.rm=TRUE)
+  min_index <- which(fdf == min,arr.ind=TRUE)[1]
+  hosp_name <- fdf[min_index,1]
+  hosp_name
+}
+best("TX", "heart attack")
+best("TX", "heart failure")
+best("MD", "heart attack")
+best("BB", "heart attack")
+best("NY", "hert attack")
+kidshealer128@gmail.com
+
+
+#Q3---Ranking hospital by outcome in state
+rankhospital <- function(state,outcome,num="best"){
+  filez <- read.csv("outcome-of-care-measures.csv", colClasses="character")
+  SelectedState <- filez[filez$State == state,] #extract all rows where column state equals state
+  rank <- c("best","worst")
+  
+  SelectedState[,11] <- as.numeric(SelectedState[,11])
+  SelectedState[,17] <- as.numeric(SelectedState[,17])
+  SelectedState[,23] <- as.numeric(SelectedState[,23])
+  NumOutcome <- c("heart attack", "heart failure","pneumoni")
+  if(!state %in% filez$State){
+    stop("invalid state")}
+  else if(!outcome %in% NumOutcome){
+    stop("invalid outcome")}
+  else{
+    if(outcome=="heart attack"){
+      outPass = 11}
+    else if (outcome == "heart failure"){
+      outPass = 17}
+    else{
+      outPass = 23} 
+  }
+  
+  ff <- SelectedState[,c(2,outPass)]
+  ff <- ff[complete.cases(ff),]
+  ff <- ff[order(ff[,2],ff[,1]),]
+  
+  if(num == "best"){
+    numb = 1}
+  else if (num =="worst"){
+    numb = nrow(ff)}
+  else{
+    numb = num
+  }
+
+  hosp_name <- ff[numb,1]
+  hosp_name
+
+}
+rankhospital("TX", "heart failure",4)
+rankhospital("MD", "heart attack","worst")
+rankhospital("MD", "heart attack",5000)
+
+#Q4---Rank Hospital In All State
+rankall <- function(outcome,num="best"){
+  filez <- read.csv("outcome-of-care-measures.csv", colClasses="character")
+  rank <- c("best","worst")
+  NumOutcome <- c("heart attack", "heart failure","pneumonia")
+  
+  states <- unique(filez[,7])
+  states <- sort(states)
+
+  filez[,11] <- as.numeric(filez[,11])
+  filez[,17] <- as.numeric(filez[,17])
+  filez[,23] <- as.numeric(filez[,23])
+  
+  filez <- filez[,c(2,7,11,17,23)]
+  filez <- filez[complete.cases(filez),]
+  
+  df <- data.frame(matrix(ncol=2,nrow=0)) #creates a empty dataframe to append our data
+  x <- c('Hospital.Name','State') #make the names of the columns
+  colnames(df)<-x #set the names of the columns
+  
+  if(!outcome %in% NumOutcome){
+    stop("invalid outcome")}
+  else{
+    if(outcome=="heart attack"){
+      outPass = 11}
+    else if (outcome == "heart failure"){
+      outPass = 17}
+    else{
+      outPass = 23} 
+  }
+  
+  for(i in 1:length(states)){
+    ff <- filez[filez[2]==states[i],]
+    ff <- ff[complete.cases(ff),]
+    ff <- ff[order(ff[c(3)]),]
+    
+    if(num == "best"){
+      numb = 1}
+    else if (num =="worst"){
+      numb = nrow(ff)}
+    else{
+      numb = num
+    }
+    
+    ff <- ff[numb,c(1,2)]
+    df <- rbind(df,ff)
+    }
+    
+  df
+}
+
+head(rankall("heart attack", 20), 10)
+tail(rankall("pneumonia", "worst"), 3)
+tail(rankall("heart failure"), 10)
