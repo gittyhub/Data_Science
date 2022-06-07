@@ -15,7 +15,7 @@ best <- function(state,outcome){
   SelectedState[,11] <- as.numeric(SelectedState[,11])
   SelectedState[,17] <- as.numeric(SelectedState[,17])
   SelectedState[,23] <- as.numeric(SelectedState[,23])
-  NumOutcome <- c("heart attack", "heart failure","pneumoni")
+  NumOutcome <- c("heart attack", "heart failure","pneumonia")
   if(!state %in% filez$State){
     stop("invalid state")}
   else if(!outcome %in% NumOutcome){
@@ -52,7 +52,7 @@ rankhospital <- function(state,outcome,num="best"){
   SelectedState[,11] <- as.numeric(SelectedState[,11])
   SelectedState[,17] <- as.numeric(SelectedState[,17])
   SelectedState[,23] <- as.numeric(SelectedState[,23])
-  NumOutcome <- c("heart attack", "heart failure","pneumoni")
+  NumOutcome <- c("heart attack", "heart failure","pneumonia")
   if(!state %in% filez$State){
     stop("invalid state")}
   else if(!outcome %in% NumOutcome){
